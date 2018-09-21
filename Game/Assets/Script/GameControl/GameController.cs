@@ -42,9 +42,22 @@ public class GameController : MonoBehaviour {
 
     void Update () {
 
-        // Escape Key Press
+        // Escape Key Press ...
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            PauseMenuController.pauseMenuController.TriggerPauseMenu();
+            // ... Opens Pause Menu
+            if (!InventoryMenuController.inventoryMenuController.isActiveAndEnabled) {
+                PauseMenuController.pauseMenuController.TriggerPauseMenu();
+            } 
+            // ... Closes Inventory Menu
+            else {
+                InventoryMenuController.inventoryMenuController.TriggerInventoryMenu();
+            }
+        }
+        // i Key Press
+        if (Input.GetKeyDown(KeyCode.I)) {
+            if (! PauseMenuController.pauseMenuController.isActiveAndEnabled){
+                InventoryMenuController.inventoryMenuController.TriggerInventoryMenu();
+            }
         }
 
 	}
