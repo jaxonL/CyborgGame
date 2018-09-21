@@ -11,7 +11,21 @@ public class InventoryItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public string description;
 
     private Text displayedDescription;
-    // Use this for initialization
+
+    void Start () {
+
+        // When this is loaded in the inventory (by load file or pickup)
+        // Ensure no other objects in the scene has the same name
+        // NOTE: This assumes that every item is unique
+        // Expensive implementation but runs once per scene (negligeable)
+        CollectibleItem[] sceneItems = FindObjectsOfType<CollectibleItem>();
+        foreach(CollectibleItem item in sceneItems) {
+            if (item.name == itemName) {
+                Destroy(item.gameObject);
+            }
+        }
+    }
+
     private void FindDisplayedText()
     {
         if (displayedDescription == null) {
