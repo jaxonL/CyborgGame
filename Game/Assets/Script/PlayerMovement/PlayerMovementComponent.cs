@@ -3,17 +3,20 @@ using UnityEngine.Events;
 
 public class PlayerMovementComponent : MonoBehaviour
 {
-	[SerializeField] private float JumpForce = 400f;							// Amount of force added when the player jumps.
+	[SerializeField] private float JumpForce = 200.0f;							// Amount of force added when the player jumps.
 	[Range(0, .3f)] [SerializeField] private float MovementSmoothing = .05f;	// How much to smooth out the movement
 	[SerializeField] private bool AirControl = false;							// Whether or not a player can steer while jumping;
 	[SerializeField] private LayerMask WhatIsGround;							// A mask determining what is ground to the character
 	[SerializeField] private Transform GroundCheck;							// A position marking where to check if the player is grounded.
+    [SerializeField] private Transform GroundCheckAir;
 
-	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
-	private bool _Grounded;            // Whether or not the player is grounded.
+
+    const float k_GroundedRadius = .002f; // Radius of the overlap circle to determine if grounded
+    private bool _Grounded = true;            // Whether or not the player is grounded.
 	private Rigidbody2D _Rigidbody2D;
 	private bool _FacingRight = true;  // For determining which way the player is currently facing.
 	private Vector3 _Velocity = Vector3.zero;
+    private bool _Landing = false;
 
 	[Header("Events")]
 	[Space]
@@ -22,6 +25,11 @@ public class PlayerMovementComponent : MonoBehaviour
 
 	[System.Serializable]
 	public class BoolEvent : UnityEvent<bool> { }
+
+    public bool IsGrounded()
+    {
+        return _Grounded;
+    }
 
 	private void Awake()
 	{
@@ -36,18 +44,32 @@ public class PlayerMovementComponent : MonoBehaviour
 		bool wasGrounded = _Grounded;
 		_Grounded = false;
 
-		// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-		// This can be done using layers instead but Sample Assets will not overwrite your project settings.
-		Collider2D[] colliders = Physics2D.OverlapCircleAll(GroundCheck.position, k_GroundedRadius, WhatIsGround);
-		for (int i = 0; i < colliders.Length; i++)
-		{
-			if (colliders[i].gameObject != gameObject)
-			{
-				_Grounded = true;
-				if (!wasGrounded)
-					OnLandEvent.Invoke();
-			}
-		}
+        // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
+        // This can be done using layers instead but Sample Assets will not overwrite your project settings.
+        Collider2D[] colliders;
+
+        colliders = Physics2D.OverlapCircleAll(GroundCheck.position, k_GroundedRadius, WhatIsGround);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i].gameObject != gameObject)
+            {
+                _Grounded = true;
+                if (!wasGrounded)
+                {
+                    Debug.Log("landed");
+                    _Landing = true;
+
+                }
+                if (_Landing && _Rigidbody2D.velocity.y < 0)
+                {
+                    OnLandEvent.Invoke();
+                    _Landing = false;
+                }
+
+            }
+        }
+
+		
 	}
 
 
@@ -75,10 +97,10 @@ public class PlayerMovementComponent : MonoBehaviour
 			}
 		}
 		// If the player should jump...
-		if (_Grounded && jump)
+		if (_Grounded && jump && !_Landing)
 		{
 			// Add a vertical force to the player.
-			_Grounded = false;
+			//_Grounded = false;
 			_Rigidbody2D.AddForce(new Vector2(0f, JumpForce));
 		}
 	}
