@@ -1,0 +1,10 @@
+[start]
+bob:: hello
+
+bob:: greeting from outer space my friend
+
+who is this weird looking guy?
+
+me:: nice... to meet you?
+
+[end]

@@ -1,0 +1,16 @@
+picture1 = '/absolute/path/to/picture1.png'
+picture2 = '../relative/path/to/picture2.png'
+
+[start]
+name1: this is what's being said
+name2: emotion1: i am speaking with emotion!!
+
+they are terrifying, i think to myself
+
+myname: i'll just go now...
+
+{{picture1}}
+
+{{picture2}}
+
+[end]
